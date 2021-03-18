@@ -8,11 +8,11 @@ const app = express();
 app.use(user);
 app.use(card);
 
-app.get('/', (req, res)=>{
-  res.status(404).send({ message: "Requested resource not found" });
+app.get('*', (req, res) => {
+  res.status(404).send({ message: 'Requested resource not found' });
 });
 
 app.listen(PORT, () => {
   // if everything works fine, the console will show which port the application is listening to
-    console.log(`App listening at port ${PORT}`)
-})
+  console.log(`App listening at port ${PORT}`);
+});
