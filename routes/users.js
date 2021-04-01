@@ -1,28 +1,13 @@
 const router = require('express').Router();
-const fs = require('fs').promises;
-const path = require('path');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+const {getUsers, createUser, getUserById} = require('../controllers/usersControllers');
 
-const users = path.join(__dirname, '../data/users.json');
-const User = require('../models/user');
+router.post('/users', jsonParser, createUser);
 
-router.post('/users', jsonParser, (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send({ message: 'Error: ' }));
-});
+router.get('/users', getUsers);
 
-router.get('/users', (req,res)=>{
-  User.find({});
-});
-
-router.get('/users/:userId', (req, res)=>{
-  User.findById(req.params.id)
-  .then(user => res.send({data: user}))
-  .catch(err =>{res.status(500).send({message: 'Error'})});
-});
+router.get('/users/:userId', getUserById);
 
 /* router.get('/users', (req, res) => {
   fs.readFile(users, 'utf8')
