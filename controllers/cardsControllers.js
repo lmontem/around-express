@@ -2,13 +2,8 @@ const Card = require('../models/card');
 
 function getCards(req, res) {
   Card.find({})
-    .then(card => { res.status(200).send({ data: card }) })
-    .catch(err => {
-      if (err.name === "ValidatorError") { return res.status(400).send({message: 'Invalid card'}) }
-      else if (err.name === "CastError") { return res.status(404).send({ message: 'Card not found' }) }
-      else { return res.status(500).send({message: 'Error'}) }
-    })
-
+    .then((card) => { res.status(200).send({ data: card }); })
+    .catch(() => res.status(500).send({ message: 'Error' }));
 }
 
 function createCard(req, res) {
@@ -16,15 +11,14 @@ function createCard(req, res) {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === "ValidatorError") { return res.status(400).send({message: 'Invalid card'}) }
-      else if (err.name === "CastError") { return res.status(404).send({ message: 'Card not found' }) }
-      else { return res.status(500).send({message: 'Error'}) }
+      if (err.name === 'CastError') { return res.status(400).send({ message: 'Invalid card' }); }
+      return res.status(500).send({ message: 'Error' });
     });
 }
 
 function deleteCard(req, res) {
   Card.findByIdAndRemove(req.params.cardId)
-    .then(card => {
+    .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Card not found' });
       } else {
@@ -32,9 +26,9 @@ function deleteCard(req, res) {
       }
     })
     .catch((err) => {
-      if (err.name === "ValidatorError") { return res.status(400).send({message: 'Invalid card'}) }
-      else if (err.name === "CastError") { return res.status(404).send({ message: 'Card not found' }) }
-      else { return res.status(500).send({message: 'Error'}) }
+      if (err.name === 'CastError') { return res.status(400).send({ message: 'Invalid card' }); }
+      if (err.name === 'NotFound') { return res.status(404).send({ message: 'Card not found' }); }
+      return res.status(500).send({ message: 'Error' });
     });
 }
 
@@ -44,7 +38,7 @@ function likeCard(req, res) {
     { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
     { new: true },
   )
-    .then(card => {
+    .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Card not found' });
       } else {
@@ -52,9 +46,9 @@ function likeCard(req, res) {
       }
     })
     .catch((err) => {
-      if (err.name === "ValidatorError") { return res.status(400).send({message: 'Invalid card'}) }
-      else if (err.name === "CastError") { return res.status(404).send({ message: 'Card not found' }) }
-      else { return res.status(500).send({message: 'Error'}) }
+      if (err.name === 'CastError') { return res.status(400).send({ message: 'Invalid card' }); }
+      if (err.name === 'NotFound') { return res.status(404).send({ message: 'Card not found' }); }
+      return res.status(500).send({ message: 'Error' });
     });
 }
 
@@ -64,7 +58,7 @@ function dislikeCard(req, res) {
     { $pull: { likes: req.user._id } }, // remove _id from the array
     { new: true },
   )
-    .then(card => {
+    .then((card) => {
       if (!card) {
         res.status(404).send({ message: 'Card not found' });
       } else {
@@ -72,10 +66,12 @@ function dislikeCard(req, res) {
       }
     })
     .catch((err) => {
-      if (err.name === "ValidatorError") { return res.status(400).send({message: 'Invalid card'}) }
-      else if (err.name === "CastError") { return res.status(404).send({ message: 'Card not found' }) }
-      else { return res.status(500).send({message: 'Error'}) }
+      if (err.name === 'CastError') { return res.status(400).send({ message: 'Invalid card' }); }
+      if (err.name === 'NotFound') { return res.status(404).send({ message: 'Card not found' }); }
+      return res.status(500).send({ message: 'Error' });
     });
 }
 
-module.exports = { getCards, createCard, deleteCard, likeCard, dislikeCard }
+module.exports = {
+  getCards, createCard, deleteCard, likeCard, dislikeCard,
+};
