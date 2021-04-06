@@ -11,7 +11,7 @@ function createCard(req, res) {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === 'CastError') { return res.status(400).send({ message: 'Invalid card' }); }
+      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Invalid data' }); }
       return res.status(500).send({ message: 'Error' });
     });
 }
